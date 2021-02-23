@@ -9,7 +9,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import CustomerSerializer
+from django.contrib.auth import views as auth_views, forms as auth_forms
+from django.urls import reverse_lazy
+from django.views import generic
 
+
+class SignUpView(generic.CreateView):
+    form_class = CustomUserCreationForm
+    success_url = reverse_lazy('login')
+    template_name = 'portfolio/signup.html'
 
 now = timezone.now()
 def home(request):
@@ -177,10 +185,10 @@ def portfolio(request,pk):
        sum_current_investment_value += investment.recent_value
        investment_result += investment.results_by_investment()
 
-   for mutualfund in mutualfunds:
-       sum_purchased_value = Mutualfund.objects.all().aggregate(Sum('purchased_value'))
-       sum_recent_value_mutual = Mutualfund.objects.all().aggregate(Sum('recent_value'))
-       result_mutual = Mutualfund.objects.all().aggregate(sum_result=Sum('recent_value') - Sum('purchased_value'))
+   # for mutualfund in mutualfunds:
+   sum_purchased_value = mutualfunds.aggregate(Sum('purchased_value'))
+   sum_recent_value_mutual = mutualfunds.aggregate(Sum('recent_value'))
+   result_mutual = mutualfunds.aggregate(sum_result=Sum('recent_value') - Sum('purchased_value'))
 
    portfolio_initial_investment = float(sum_of_initial_investment_value) + float(sum_of_initial_stock_value)
    portfolio_current_investment = float(sum_current_investment_value) + float(sum_current_stocks_value)
@@ -258,3 +266,33 @@ def mutualfund_delete(request, pk):
     mutualfund.delete()
     mutualfunds = Mutualfund.objects.filter( purchased_date__lte=timezone.now())
     return render(request, 'portfolio/mutualfund_list.html', { 'mutualfunds': mutualfunds})
+
+class ChangePasswordResetDoneView(auth_views.PasswordChangeView):
+    form_class = auth_forms.PasswordChangeForm
+    template_name = 'portfolio/password_change.html'
+    success_url = reverse_lazy('portfolio:password_changedone')
+
+class ChangePasswordResetDoneSuccessView(auth_views.PasswordChangeView):
+    form_class = auth_forms.PasswordChangeForm
+    template_name = 'portfolio/password_changedone.html'
+
+class PasswordResetView(auth_views.PasswordResetView):
+    form_class = auth_forms.PasswordResetForm
+    template_name = 'portfolio/reset_password.html'
+    email_template_name = 'portfolio/reset_password_email.html'
+    success_url = reverse_lazy('portfolio:reset_password_done')
+
+class PasswordResetDoneView(auth_views.PasswordResetDoneView):
+    form_class = auth_forms.PasswordResetForm
+    template_name = 'portfolio/reset_password_done.html'
+    #success_url = reverse_lazy('reset_password_done')
+
+class PasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    form_class = auth_forms.SetPasswordForm
+    template_name = 'portfolio/reset_password_confirm.html'
+    success_url = reverse_lazy('portfolio:reset_password_complete')
+
+class PasswordResetCompleteView(auth_views.PasswordResetCompleteView):
+    form_class = auth_forms.PasswordResetForm
+    template_name = 'portfolio/reset_password_complete.html'
+    #success_url = reverse_lazy('login.html')

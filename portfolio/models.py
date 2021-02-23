@@ -2,7 +2,15 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 import requests
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
+
+class CustomUserCreationForm(UserCreationForm):
+
+    class Meta(UserCreationForm):
+        model = User
+        fields = ('username', 'email')
 
 # Create your models here.
 class Customer(models.Model):

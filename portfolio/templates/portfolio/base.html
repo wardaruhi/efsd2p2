@@ -83,10 +83,12 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="{% url 'logout' %}"><i class="fa fa-btn fa-sign-out"></i>Logout</a></li>
+                            <li><a class="dropdown-item" href="{% url 'portfolio:password-change' %}"><span class="glyphicon glyphicon-edit"></span> Change Password</a></li>
                         </ul>
                     </li>
                 {% else %}
                     <li><a href="{% url 'login' %}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+                    <li><a href="{% url 'portfolio:signup' %}" ><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
                 {% endif %}
             </ul>
         </div>
