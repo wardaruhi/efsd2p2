@@ -136,10 +136,12 @@ def investment_delete(request, pk):
 
 @login_required
 def portfolio(request,pk):
+   global sum_purchased_value, sum_recent_value_mutual, result_mutual
    customer = get_object_or_404(Customer, pk=pk)
    customers = Customer.objects.filter(created_date__lte=timezone.now())
    investments =Investment.objects.filter(customer=pk)
    stocks = Stock.objects.filter(customer=pk)
+   mutualfunds = Mutualfund.objects.filter(customer=pk)
    sum_recent_value = Investment.objects.filter(customer=pk).aggregate(Sum('recent_value'))
    sum_acquired_value = Investment.objects.filter(customer=pk).aggregate(Sum('acquired_value'))
    #overall_investment_results = sum_recent_value-sum_acquired_value
@@ -160,12 +162,21 @@ def portfolio(request,pk):
        sum_current_investment_value += investment.recent_value
        investment_result += investment.results_by_investment()
 
+   for mutualfund in mutualfunds:
+       sum_purchased_value = Mutualfund.objects.all().aggregate(Sum('purchased_value'))
+       sum_recent_value_mutual = Mutualfund.objects.all().aggregate(Sum('recent_value'))
+       result_mutual = Mutualfund.objects.all().aggregate(sum_result=Sum('recent_value') - Sum('purchased_value'))
+
    portfolio_initial_investment = float(sum_of_initial_investment_value) + float(sum_of_initial_stock_value)
    portfolio_current_investment = float(sum_current_investment_value) + float(sum_current_stocks_value)
 
    return render(request, 'portfolio/portfolio.html', {'customers': customers,
                                                        'investments': investments,
                                                        'stocks': stocks,
+                                                       'mutualfunds': mutualfunds,
+                                                       'sum_purchased_value': sum_purchased_value,
+                                                       'sum_recent_value_mutual': sum_recent_value_mutual,
+                                                       'result_mutual': result_mutual,
                                                        'sum_acquired_value': sum_acquired_value,
                                                        'sum_recent_value': sum_recent_value,
                                                        'sum_current_stocks_value': sum_current_stocks_value,

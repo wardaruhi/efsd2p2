@@ -88,7 +88,7 @@ class Stock(models.Model):
         return self.current_stock_value() - self.initial_stock_value()
 
 class Mutualfund(models.Model):
-    customer = models.ForeignKey(Customer, related_name='mutualfunds', on_delete=models.DO_NOTHING)
+    customer = models.ForeignKey(Customer, related_name='mutualfunds', on_delete=models.CASCADE)
     category = models.CharField(max_length=50)
     description = models.CharField(max_length=200)
     shares = models.DecimalField(max_digits=10, decimal_places=1)
