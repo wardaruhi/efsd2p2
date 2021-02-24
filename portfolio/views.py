@@ -25,6 +25,12 @@ def home(request):
                  {'portfolio': home})
 
 @login_required
+def customer_list(request):
+    customer = Customer.objects.filter(created_date__lte=timezone.now())
+    return render(request, 'portfolio/customer_list.html',
+                 {'customers': customer})
+
+@login_required
 def customer_new(request):
    if request.method == "POST":
        form = CustomerForm(request.POST)
@@ -32,18 +38,13 @@ def customer_new(request):
            customer = form.save(commit=False)
            customer.created_date = timezone.now()
            customer.save()
+           customers = Customer.objects.filter(created_date__lte=timezone.now())
            return render(request, 'portfolio/customer_list.html',
-                         {'customer': customer})
+                         {'customers': customers})
    else:
        form = CustomerForm()
        # print("Else")
    return render(request, 'portfolio/customer_new.html', {'form': form})
-
-@login_required
-def customer_list(request):
-    customer = Customer.objects.filter(created_date__lte=timezone.now())
-    return render(request, 'portfolio/customer_list.html',
-                 {'customers': customer})
 
 @login_required
 def customer_edit(request, pk):
